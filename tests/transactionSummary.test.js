@@ -22,3 +22,20 @@ test('summarizes income, expense, balance, and category totals', () => {
     { type: 'expense', category: 'Groceries', total: 150 },
   ]);
 });
+
+test('ignores invalid records and aggregates repeated categories in linear time', () => {
+  const summary = summarizeTransactions([
+    { type: 'expense', amount: 10, category: 'Food' },
+    { type: 'expense', amount: '2.5', category: 'Food' },
+    { type: 'income', amount: 100, category: 'Salary' },
+    { type: 'other', amount: 999, category: 'Ignored' },
+    { type: 'expense', amount: -1, category: 'Ignored' },
+  ]);
+
+  assert.equal(summary.totalIncome, 100);
+  assert.equal(summary.totalExpenses, 12.5);
+  assert.deepEqual(summary.byCategory, [
+    { type: 'expense', category: 'Food', total: 12.5 },
+    { type: 'income', category: 'Salary', total: 100 },
+  ]);
+});

@@ -1,15 +1,24 @@
 const express = require('express');
 const Transaction = require('../models/Transaction');
+const Income = require('../models/Income');
 const { requireAuth, requireSameUser } = require('../middleware/auth');
+const { requireValidId } = require('../middleware/validation');
 
 const router = express.Router();
 
 router.use(requireAuth);
 
-router.get('/:userId', requireSameUser, async (req, res) => {
+router.get('/:userId', requireValidId('userId'), requireSameUser, async (req, res) => {
   try {
-    const transactions = await Transaction.find({ userId: req.params.userId });
-    const totals = transactions.reduce((acc, item) => {
+    const [transactions, incomes] = await Promise.all([
+      Transaction.find({ userId: req.params.userId }).lean(),
+      Income.find({ userId: req.params.userId }).lean(),
+    ]);
+    const records = [
+      ...transactions.filter((transaction) => transaction.type === 'expense'),
+      ...incomes.map((income) => ({ ...income, type: 'income' })),
+    ];
+    const totals = records.reduce((acc, item) => {
       const key = `${item.type}:${item.category}`;
       acc[key] = (acc[key] || 0) + Number(item.amount);
       return acc;

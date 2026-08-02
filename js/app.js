@@ -5,7 +5,82 @@ const state = {
   selectedIncomeId: null,
   selectedCategoryId: null,
   selectedBudgetId: null,
+  activeTab: 'dashboard',
 };
+
+const bangla = {
+  'Expense Tracker': 'খরচ ট্র্যাকার',
+  'Manage your expenses smartly': 'স্মার্টভাবে আপনার খরচ পরিচালনা করুন',
+  'Username': 'ব্যবহারকারীর নাম',
+  'Password': 'পাসওয়ার্ড',
+  'LOGIN': 'লগইন',
+  "Don't have an account?": 'অ্যাকাউন্ট নেই?',
+  'Sign up': 'নিবন্ধন করুন',
+  'Welcome Back': 'আবার স্বাগতম',
+  'Track daily expenses': 'দৈনিক খরচ ট্র্যাক করুন',
+  'Create monthly budgets': 'মাসিক বাজেট তৈরি করুন',
+  'Analyze your spending': 'আপনার খরচ বিশ্লেষণ করুন',
+  'Create Account': 'অ্যাকাউন্ট তৈরি করুন',
+  'Start managing your finances today': 'আজই আপনার আর্থিক ব্যবস্থাপনা শুরু করুন',
+  'Full Name': 'পূর্ণ নাম',
+  'Gmail Address': 'জিমেইল ঠিকানা',
+  'CREATE ACCOUNT': 'অ্যাকাউন্ট তৈরি করুন',
+  'Already have an account?': 'ইতিমধ্যে অ্যাকাউন্ট আছে?',
+  'Login': 'লগইন',
+  'Why Expense Tracker?': 'খরচ ট্র্যাকার কেন?',
+  'Track daily expenses effortlessly': 'সহজে দৈনিক খরচ ট্র্যাক করুন',
+  'Create and manage monthly budgets': 'মাসিক বাজেট তৈরি ও পরিচালনা করুন',
+  'Analyze spending patterns & insights': 'খরচের ধরন ও বিশ্লেষণ দেখুন',
+  'Dashboard': 'ড্যাশবোর্ড', 'Expenses': 'খরচ', 'Income': 'আয়', 'Categories': 'বিভাগ',
+  'Budgets': 'বাজেট', 'Reports': 'রিপোর্ট', 'Profile': 'প্রোফাইল', 'Settings': 'সেটিংস', 'Logout': 'লগআউট',
+  'Why Track Your Expenses?': 'খরচ ট্র্যাক করবেন কেন?',
+  'Tracking expenses is key to financial success. It helps you:': 'খরচ ট্র্যাক করা আর্থিক সাফল্যের জন্য গুরুত্বপূর্ণ। এটি আপনাকে সাহায্য করে:',
+  'Gain clear insight into your spending habits': 'আপনার খরচের অভ্যাস পরিষ্কারভাবে বুঝতে',
+  'Identify and reduce unnecessary expenses': 'অপ্রয়োজনীয় খরচ শনাক্ত ও কমাতে',
+  'Create realistic and effective budgets': 'বাস্তবসম্মত ও কার্যকর বাজেট তৈরি করতে',
+  'Close': 'বন্ধ করুন', 'Yes': 'হ্যাঁ', 'No': 'না',
+  'Welcome back, ': 'আবার স্বাগতম, ', 'Summary for ': 'সারসংক্ষেপ: ',
+  'Income This Month': 'এই মাসের আয়', 'Spent This Month': 'এই মাসের খরচ', 'Current Balance': 'বর্তমান ব্যালেন্স', 'Top Category': 'শীর্ষ বিভাগ',
+  'Recent Transactions': 'সাম্প্রতিক লেনদেন', 'Date': 'তারিখ', 'Type': 'ধরন', 'Description': 'বিবরণ', 'Category': 'বিভাগ', 'Amount': 'পরিমাণ',
+  'Income': 'আয়', 'Expense': 'খরচ', 'No transactions recorded yet': 'এখনও কোনো লেনদেন নেই',
+  'Add / Update Expense': 'খরচ যোগ / হালনাগাদ করুন', 'Add / Update Income': 'আয় যোগ / হালনাগাদ করুন',
+  '-- Select --': '-- নির্বাচন করুন --', 'Optional': 'ঐচ্ছিক', 'Add': 'যোগ করুন', 'Update': 'হালনাগাদ করুন', 'Delete': 'মুছুন',
+  'ID': 'আইডি', 'No expenses yet': 'এখনও কোনো খরচ নেই', 'No income recorded yet': 'এখনও কোনো আয় নেই',
+  'Manage Categories': 'বিভাগ পরিচালনা করুন', 'Category Name': 'বিভাগের নাম', 'e.g. Groceries': 'যেমন: বাজার', 'Your Categories': 'আপনার বিভাগসমূহ', 'No categories yet': 'এখনও কোনো বিভাগ নেই',
+  'Add / Update Budget': 'বাজেট যোগ / হালনাগাদ করুন', 'Month': 'মাস', 'Budget Amount': 'বাজেটের পরিমাণ', 'Save': 'সংরক্ষণ করুন', 'Budget': 'বাজেট', 'Spend': 'খরচ', 'No budgets yet': 'এখনও কোনো বাজেট নেই',
+  'Income & Expense Report': 'আয় ও খরচের রিপোর্ট', 'Summary Table': 'সারসংক্ষেপ তালিকা', 'Total Amount': 'মোট পরিমাণ', 'No data yet': 'এখনও কোনো তথ্য নেই',
+  'User Profile': 'ব্যবহারকারী প্রোফাইল', 'Email': 'ইমেইল', 'New Password': 'নতুন পাসওয়ার্ড', 'Update Profile': 'প্রোফাইল হালনাগাদ করুন',
+  'Application Settings': 'অ্যাপ্লিকেশন সেটিংস', 'Theme': 'থিম', 'Light': 'হালকা', 'Dark': 'গাঢ়', 'Currency': 'মুদ্রা', 'Preview:': 'পূর্বদর্শন:',
+  'Enable Notifications': 'নোটিফিকেশন চালু করুন', 'Language': 'ভাষা', 'Save Settings': 'সেটিংস সংরক্ষণ করুন',
+  'Bangladeshi Taka (BDT)': 'বাংলাদেশি টাকা (BDT)', 'US Dollar (USD)': 'মার্কিন ডলার (USD)', 'Euro (EUR)': 'ইউরো (EUR)', 'British Pound (GBP)': 'ব্রিটিশ পাউন্ড (GBP)', 'Indian Rupee (INR)': 'ভারতীয় রুপি (INR)',
+  'Please enter username and password': 'ব্যবহারকারীর নাম ও পাসওয়ার্ড দিন', 'Login successful': 'সফলভাবে লগইন হয়েছে', 'Login failed': 'লগইন ব্যর্থ হয়েছে',
+  'Please fill in all fields': 'সব ঘর পূরণ করুন', 'Username must be 3-16 characters long': 'ব্যবহারকারীর নাম ৩-১৬ অক্ষরের হতে হবে', 'Account created successfully': 'অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে',
+  'Are you sure you want to log out?': 'আপনি কি লগআউট করতে চান?', 'Expense added': 'খরচ যোগ হয়েছে', 'Please select an expense to update': 'হালনাগাদের জন্য একটি খরচ নির্বাচন করুন',
+  'Expense updated': 'খরচ হালনাগাদ হয়েছে', 'Please select an expense to delete': 'মুছতে একটি খরচ নির্বাচন করুন', 'Delete this expense?': 'এই খরচটি মুছবেন?', 'Expense deleted': 'খরচ মুছে ফেলা হয়েছে',
+  'Income added': 'আয় যোগ হয়েছে', 'Please select an income record to update': 'হালনাগাদের জন্য একটি আয়ের রেকর্ড নির্বাচন করুন', 'Income updated': 'আয় হালনাগাদ হয়েছে',
+  'Please select an income record to delete': 'মুছতে একটি আয়ের রেকর্ড নির্বাচন করুন', 'Delete this income record?': 'এই আয়ের রেকর্ডটি মুছবেন?', 'Income deleted': 'আয়ের রেকর্ড মুছে ফেলা হয়েছে',
+  'Category name cannot be empty': 'বিভাগের নাম খালি রাখা যাবে না', 'Category added': 'বিভাগ যোগ হয়েছে', 'Please select a category to update': 'হালনাগাদের জন্য একটি বিভাগ নির্বাচন করুন',
+  'Category updated': 'বিভাগ হালনাগাদ হয়েছে', 'Please select a category to delete': 'মুছতে একটি বিভাগ নির্বাচন করুন', 'Delete this category?': 'এই বিভাগটি মুছবেন?', 'Category deleted': 'বিভাগ মুছে ফেলা হয়েছে',
+  'Budget saved': 'বাজেট সংরক্ষণ হয়েছে', 'Please select a budget to delete': 'মুছতে একটি বাজেট নির্বাচন করুন', 'Delete this budget?': 'এই বাজেটটি মুছবেন?', 'Budget deleted': 'বাজেট মুছে ফেলা হয়েছে',
+  'Profile updated': 'প্রোফাইল হালনাগাদ হয়েছে', 'Settings saved': 'সেটিংস সংরক্ষণ হয়েছে', 'None': 'কোনোটিই নয়',
+};
+
+function t(value) {
+  return state.user?.language === 'Bangla' ? (bangla[value] || value) : value;
+}
+
+function translateElement(root = document.body) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach((node) => {
+    const source = node.__translationSource || node.nodeValue;
+    node.__translationSource = source;
+    const text = source.trim();
+    const translated = state.user?.language === 'Bangla' && bangla[text] ? bangla[text] : text;
+    if (text) node.nodeValue = source.replace(text, translated);
+  });
+}
 
 const api = {
   async request(path, options = {}) {
@@ -23,10 +98,6 @@ const api = {
   login(payload) { return this.request('/auth/login', { method: 'POST', body: JSON.stringify(payload) }); },
   signup(payload) { return this.request('/auth/signup', { method: 'POST', body: JSON.stringify(payload) }); },
   me() { return this.request('/auth/me'); },
-  getExpenses(userId) { return this.request(`/expenses/${userId}`); },
-  addExpense(userId, payload) { return this.request(`/expenses/${userId}`, { method: 'POST', body: JSON.stringify(payload) }); },
-  updateExpense(id, payload) { return this.request(`/expenses/${id}`, { method: 'PUT', body: JSON.stringify(payload) }); },
-  deleteExpense(id) { return this.request(`/expenses/${id}`, { method: 'DELETE' }); },
   getIncomes(userId) { return this.request(`/incomes/${userId}`); },
   addIncome(userId, payload) { return this.request(`/incomes/${userId}`, { method: 'POST', body: JSON.stringify(payload) }); },
   updateIncome(id, payload) { return this.request(`/incomes/${id}`, { method: 'PUT', body: JSON.stringify(payload) }); },
@@ -86,8 +157,38 @@ function confirmNo() {
   window.confirmCallback = null;
 }
 
-function formatMoney(value) {
-  return `$${Number(value || 0).toFixed(2)}`;
+function formatMoney(value, recordCurrency) {
+  const currency = recordCurrency || state.user?.currency || 'BDT';
+  const locales = { BDT: state.user?.language === 'Bangla' ? 'bn-BD' : 'en-BD', USD: 'en-US', EUR: 'de-DE', GBP: 'en-GB', INR: 'en-IN' };
+  return new Intl.NumberFormat(locales[currency] || 'en-BD', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+  }).format(Number(value || 0));
+}
+
+function applyTheme(theme = state.user?.theme || 'Light') {
+  document.documentElement.dataset.theme = theme.toLowerCase();
+  document.documentElement.style.colorScheme = theme === 'Dark' ? 'dark' : 'light';
+}
+
+function applyLanguage(language = state.user?.language || 'English') {
+  document.documentElement.lang = language === 'Bangla' ? 'bn' : language.slice(0, 2).toLowerCase();
+  document.documentElement.dataset.language = language.toLowerCase();
+  document.title = t('Expense Tracker');
+  translateElement();
+}
+
+function previewTheme() {
+  applyTheme(document.getElementById('sTheme').value);
+}
+
+function previewCurrency() {
+  const currency = document.getElementById('sCurrency').value;
+  document.getElementById('currencyPreview').textContent = new Intl.NumberFormat(
+    { BDT: 'en-BD', USD: 'en-US', EUR: 'de-DE', GBP: 'en-GB', INR: 'en-IN' }[currency] || 'en-BD',
+    { style: 'currency', currency, minimumFractionDigits: 2 },
+  ).format(1250.5);
 }
 
 function now() {
@@ -96,7 +197,7 @@ function now() {
 
 function monthLabel() {
   const d = new Date();
-  return d.toLocaleString('default', { month: 'long' }) + ' ' + d.getFullYear();
+  return d.toLocaleString(state.user?.language === 'Bangla' ? 'bn-BD' : 'default', { month: 'long' }) + ' ' + d.getFullYear();
 }
 
 function curYM() {
@@ -180,6 +281,8 @@ function launchApp() {
   }
 
   document.querySelectorAll('.auth-page').forEach((p) => p.classList.remove('active'));
+  applyTheme();
+  applyLanguage();
   app.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
   document.querySelectorAll('.nav-btn')[0].classList.add('active');
@@ -187,6 +290,7 @@ function launchApp() {
 }
 
 function switchTab(tab, btn) {
+  state.activeTab = tab;
   document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
   btn.classList.add('active');
   const renderers = {
@@ -204,14 +308,22 @@ function switchTab(tab, btn) {
 
 function setContent(html) {
   document.getElementById('content').innerHTML = html;
+  translateElement(document.getElementById('content'));
 }
 
 async function renderDashboard() {
   if (!state.user) return;
   try {
-    const transactions = await api.getTransactions(state.user.id);
+    const [transactions, incomes] = await Promise.all([
+      api.getTransactions(state.user.id),
+      api.getIncomes(state.user.id),
+    ]);
+    const dashboardTransactions = [
+      ...transactions.filter((transaction) => transaction.type === 'expense'),
+      ...incomes.map((income) => ({ ...income, type: 'income' })),
+    ];
     const ym = curYM();
-    const monthlyTransactions = transactions.filter((item) => item.date && item.date.startsWith(ym));
+    const monthlyTransactions = dashboardTransactions.filter((item) => item.date && item.date.startsWith(ym));
     const spent = monthlyTransactions.filter((item) => item.type === 'expense').reduce((sum, item) => sum + Number(item.amount), 0);
     const received = monthlyTransactions.filter((item) => item.type === 'income').reduce((sum, item) => sum + Number(item.amount), 0);
     const balance = received - spent;
@@ -223,7 +335,7 @@ async function renderDashboard() {
     const recent = [...monthlyTransactions]
       .sort((a, b) => `${b.date}${b.createdAt || ''}`.localeCompare(`${a.date}${a.createdAt || ''}`))
       .slice(0, 5);
-    const recentRows = recent.length ? recent.map((item) => `<tr><td>${item.date}</td><td>${item.type === 'income' ? 'Income' : 'Expense'}</td><td>${item.description || ''}</td><td>${item.category}</td><td class="${item.type === 'income' ? 'green' : 'red'}">${item.type === 'income' ? '+' : '-'}${formatMoney(item.amount)}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;padding:18px;">No transactions recorded yet</td></tr>';
+    const recentRows = recent.length ? recent.map((item) => `<tr><td>${item.date}</td><td>${item.type === 'income' ? 'Income' : 'Expense'}</td><td>${item.description || ''}</td><td>${item.category}</td><td class="${item.type === 'income' ? 'green' : 'red'}">${item.type === 'income' ? '+' : '-'}${formatMoney(item.amount, item.currency)}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;padding:18px;">No transactions recorded yet</td></tr>';
 
     setContent(`
       <div class="welcome-header">Welcome back, <span>${state.user.name}!</span></div>
@@ -250,7 +362,7 @@ async function renderExpenses() {
     const [categories, transactions] = await Promise.all([api.getCategories(state.user.id), api.getTransactions(state.user.id)]);
     const expenses = transactions.filter((item) => item.type === 'expense');
     const catOptions = categories.map((c) => `<option value="${c.name}">${c.name}</option>`).join('');
-    const rows = expenses.map((e) => `<tr data-id="${e._id}" onclick="selectExpense('${e._id}')" style="cursor:pointer"><td>${e._id.slice(-4)}</td><td>${e.date}</td><td>${e.category}</td><td>${formatMoney(e.amount)}</td><td>${e.description || ''}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No expenses yet</td></tr>';
+    const rows = expenses.map((e) => `<tr data-id="${e._id}" onclick="selectExpense('${e._id}')" style="cursor:pointer"><td>${e._id.slice(-4)}</td><td>${e.date}</td><td>${e.category}</td><td>${formatMoney(e.amount, e.currency)}</td><td>${e.description || ''}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No expenses yet</td></tr>';
 
     setContent(`
       <div class="section-card blue">
@@ -342,7 +454,7 @@ async function renderIncome() {
   if (!state.user) return;
   try {
     const incomes = await api.getIncomes(state.user.id);
-    const rows = incomes.map((income) => `<tr data-id="${income._id}" onclick="selectIncome('${income._id}')" style="cursor:pointer"><td>${income._id.slice(-4)}</td><td>${income.date}</td><td>${income.category}</td><td>${formatMoney(income.amount)}</td><td>${income.description || ''}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No income recorded yet</td></tr>';
+    const rows = incomes.map((income) => `<tr data-id="${income._id}" onclick="selectIncome('${income._id}')" style="cursor:pointer"><td>${income._id.slice(-4)}</td><td>${income.date}</td><td>${income.category}</td><td>${formatMoney(income.amount, income.currency)}</td><td>${income.description || ''}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No income recorded yet</td></tr>';
 
     setContent(`
       <div class="section-card blue">
@@ -620,13 +732,16 @@ async function renderSettings() {
       <div class="section-card blue" style="max-width:480px">
         <div class="section-title">Application Settings</div>
         <div class="settings-form">
-          <div class="settings-row"><label>Theme</label><select class="form-select" id="sTheme"><option ${user.theme === 'Light' ? 'selected' : ''}>Light</option><option ${user.theme === 'Dark' ? 'selected' : ''}>Dark</option></select></div>
+          <div class="settings-row"><label>Theme</label><select class="form-select" id="sTheme" onchange="previewTheme()"><option value="Light" ${user.theme === 'Light' ? 'selected' : ''}>Light</option><option value="Dark" ${user.theme === 'Dark' ? 'selected' : ''}>Dark</option></select></div>
+          <div class="settings-row"><label>Currency</label><select class="form-select" id="sCurrency" onchange="previewCurrency()"><option value="BDT" ${(user.currency || 'BDT') === 'BDT' ? 'selected' : ''}>Bangladeshi Taka (BDT)</option><option value="USD" ${user.currency === 'USD' ? 'selected' : ''}>US Dollar (USD)</option><option value="EUR" ${user.currency === 'EUR' ? 'selected' : ''}>Euro (EUR)</option><option value="GBP" ${user.currency === 'GBP' ? 'selected' : ''}>British Pound (GBP)</option><option value="INR" ${user.currency === 'INR' ? 'selected' : ''}>Indian Rupee (INR)</option></select></div>
+          <div class="currency-preview">Preview: <strong id="currencyPreview"></strong></div>
           <div class="settings-row"><label>Enable Notifications</label><input type="checkbox" id="sNotif" ${user.notifications ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer"></div>
-          <div class="settings-row"><label>Language</label><select class="form-select" id="sLang"><option ${user.language === 'English' ? 'selected' : ''}>English</option><option ${user.language === 'Spanish' ? 'selected' : ''}>Spanish</option><option ${user.language === 'French' ? 'selected' : ''}>French</option></select></div>
+          <div class="settings-row"><label>Language</label><select class="form-select" id="sLang"><option ${user.language === 'English' ? 'selected' : ''}>English</option><option value="Bangla" ${user.language === 'Bangla' ? 'selected' : ''}>বাংলা (Bangla)</option><option ${user.language === 'Spanish' ? 'selected' : ''}>Spanish</option><option ${user.language === 'French' ? 'selected' : ''}>French</option></select></div>
           <button class="btn btn-green" onclick="saveSettings()" style="margin-top:8px">Save Settings</button>
         </div>
       </div>
     `);
+    previewCurrency();
   } catch (error) {
     toast(error.message, 'error');
   }
@@ -636,12 +751,20 @@ async function saveSettings() {
   try {
     const payload = {
       theme: document.getElementById('sTheme').value,
+      currency: document.getElementById('sCurrency').value,
       notifications: document.getElementById('sNotif').checked,
       language: document.getElementById('sLang').value,
     };
     const user = await api.updateProfile(state.user.id, payload);
     state.user = { ...state.user, ...user };
+    applyTheme();
+    applyLanguage();
     toast('Settings saved');
+    const renderer = {
+      dashboard: renderDashboard, expenses: renderExpenses, income: renderIncome, categories: renderCategories,
+      budget: renderBudget, reports: renderReports, profile: renderProfile, settings: renderSettings,
+    }[state.activeTab];
+    renderer?.();
   } catch (error) {
     toast(error.message, 'error');
   }
@@ -671,6 +794,8 @@ window.addBudget = addBudget;
 window.deleteBudget = deleteBudget;
 window.updateProfile = updateProfile;
 window.saveSettings = saveSettings;
+window.previewTheme = previewTheme;
+window.previewCurrency = previewCurrency;
 
 async function restoreSession() {
   if (!state.token) return;

@@ -1,12 +1,13 @@
 const express = require('express');
 const Category = require('../models/Category');
 const { requireAuth, requireSameUser } = require('../middleware/auth');
+const { requireValidId, validateCategory } = require('../middleware/validation');
 
 const router = express.Router();
 
 router.use(requireAuth);
 
-router.get('/:userId', requireSameUser, async (req, res) => {
+router.get('/:userId', requireValidId('userId'), requireSameUser, async (req, res) => {
   try {
     const categories = await Category.find({ userId: req.params.userId }).sort({ name: 1 });
     res.json(categories);
@@ -15,21 +16,21 @@ router.get('/:userId', requireSameUser, async (req, res) => {
   }
 });
 
-router.post('/:userId', requireSameUser, async (req, res) => {
+router.post('/:userId', requireValidId('userId'), requireSameUser, validateCategory, async (req, res) => {
   try {
-    const category = await Category.create({ userId: req.params.userId, name: req.body.name });
+    const category = await Category.create({ userId: req.params.userId, ...req.validatedBody });
     res.status(201).json(category);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireValidId(), validateCategory, async (req, res) => {
   try {
     const updated = await Category.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
-      req.body,
-      { new: true },
+      req.validatedBody,
+      { new: true, runValidators: true },
     );
     if (!updated) return res.status(404).json({ error: 'Category not found' });
     res.json(updated);
@@ -38,7 +39,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireValidId(), async (req, res) => {
   try {
     const deleted = await Category.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!deleted) return res.status(404).json({ error: 'Category not found' });

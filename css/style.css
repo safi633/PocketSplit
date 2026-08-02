@@ -12,8 +12,23 @@
   --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
+:root[data-theme="dark"] {
+  --sidebar: #111827;
+  --sidebar-hover: #1f2937;
+  --accent: #2dd4bf;
+  --royal: #7c9cff;
+  --danger: #fb7185;
+  --warning: #fbbf24;
+  --bg: #0f172a;
+  --white: #172033;
+  --text-dark: #e5e7eb;
+  --text-muted: #aab6ca;
+  --card-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text-dark); }
+:root[data-language="bangla"] body { font-family: 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif; }
 
 .auth-page { display: none; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #8200ff, #00c8ff); }
 .auth-page.active { display: flex; }
@@ -75,6 +90,7 @@ tbody td { padding: 10px 14px; }
 .stat-value.purple { color: #9b59b6; }
 .profile-form, .settings-form { max-width: 400px; display: flex; flex-direction: column; gap: 16px; }
 .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.currency-preview { color: var(--text-muted); font-size: 14px; }
 .reports-title { text-align: center; color: var(--royal); font-size: 20px; font-weight: 700; margin-bottom: 18px; }
 .modal-overlay, .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); align-items: center; justify-content: center; z-index: 100; }
 .modal-overlay.active, .confirm-overlay.active { display: flex; }

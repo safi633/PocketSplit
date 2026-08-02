@@ -3,18 +3,18 @@ const mongoose = require('mongoose');
 const dns = require('dns');
 const { promisify } = require('util');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config({ quiet: true });
 
 const authRoutes = require('./routes/auth');
-const expenseRoutes = require('./routes/expenses');
 const incomeRoutes = require('./routes/incomes');
 const transactionRoutes = require('./routes/transactions');
 const categoryRoutes = require('./routes/categories');
 const budgetRoutes = require('./routes/budgets');
 const reportRoutes = require('./routes/reports');
 const profileRoutes = require('./routes/profile');
-const User = require('./models/User');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,11 +32,18 @@ function withDatabaseName(uri) {
 mongoose.set('bufferCommands', false);
 
 app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()) : false,
+}));
+app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
+app.use(express.json({ limit: '100kb' }));
+app.use('/css', express.static(path.join(__dirname, 'css')));
+app.use('/js', express.static(path.join(__dirname, 'js')));
 
 app.use('/api/auth', authRoutes);
-app.use('/api/expenses', expenseRoutes);
 app.use('/api/incomes', incomeRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -54,6 +61,19 @@ app.get('/api', (req, res) => {
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get(['/login.html', '/signup.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, req.path.slice(1)));
+});
+
+app.use('/api', (req, res) => res.status(404).json({ error: 'API endpoint not found' }));
+app.use((error, req, res, next) => { // eslint-disable-line no-unused-vars
+  if (error instanceof SyntaxError && 'body' in error) {
+    return res.status(400).json({ error: 'Invalid JSON request body' });
+  }
+  console.error(error);
+  return res.status(500).json({ error: 'An unexpected server error occurred' });
 });
 
 const connectWithDirectAtlasHosts = async () => {
@@ -111,27 +131,15 @@ const connectToDatabase = async () => {
   console.log('The server will keep running, but database features will be unavailable until MongoDB is reachable.');
 };
 
-const removeLegacyEmailUniqueIndex = async () => {
-  if (mongoose.connection.readyState !== 1) return;
-
-  const indexes = await User.collection.indexes();
-  const emailIndex = indexes.find(index => index.name === 'email_1' && index.unique);
-  if (emailIndex) {
-    await User.collection.dropIndex(emailIndex.name);
-    console.log('Removed legacy unique email index');
-  }
-};
-
 const startServer = async () => {
   await connectToDatabase();
-  try {
-    await removeLegacyEmailUniqueIndex();
-  } catch (err) {
-    console.log(`Could not remove legacy email index: ${err.message}`);
-  }
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 };
 
-startServer();
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = { app, connectToDatabase, startServer };

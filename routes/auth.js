@@ -8,7 +8,8 @@ const { JWT_SECRET, requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-const USERNAME_REGEX = /^.{3,16}$/;
+const USERNAME_REGEX = /^[a-z0-9_]{3,16}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const safeUserResponse = (user) => ({
   id: user._id,
@@ -16,6 +17,7 @@ const safeUserResponse = (user) => ({
   email: user.email,
   username: user.username,
   theme: user.theme,
+  currency: user.currency || 'BDT',
   notifications: user.notifications,
   language: user.language,
 });
@@ -25,7 +27,13 @@ const validateSignup = ({ name, email, username, password }) => {
     return 'All fields are required';
   }
   if (!USERNAME_REGEX.test(username)) {
-    return 'Username must be 3 to 16 characters long';
+    return 'Username must be 3 to 16 characters and use letters, numbers, or underscores only';
+  }
+  if (!EMAIL_REGEX.test(email)) {
+    return 'A valid email address is required';
+  }
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long';
   }
   return null;
 };

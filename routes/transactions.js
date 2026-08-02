@@ -1,12 +1,14 @@
 const express = require('express');
 const Transaction = require('../models/Transaction');
+const User = require('../models/User');
 const { requireAuth, requireSameUser } = require('../middleware/auth');
+const { requireValidId, validateRecord } = require('../middleware/validation');
 
 const router = express.Router();
 
 router.use(requireAuth);
 
-router.get('/:userId', requireSameUser, async (req, res) => {
+router.get('/:userId', requireValidId('userId'), requireSameUser, async (req, res) => {
   try {
     const transactions = await Transaction.find({ userId: req.params.userId }).sort({ date: -1, createdAt: -1 });
     res.json(transactions);
@@ -15,15 +17,14 @@ router.get('/:userId', requireSameUser, async (req, res) => {
   }
 });
 
-router.post('/:userId', requireSameUser, async (req, res) => {
+router.post('/:userId', requireValidId('userId'), requireSameUser, validateRecord(), async (req, res) => {
   try {
+    const user = await User.findById(req.user.id).select('currency');
+    if (!user) return res.status(404).json({ error: 'User not found' });
     const transaction = await Transaction.create({
       userId: req.params.userId,
-      type: req.body.type,
-      amount: req.body.amount,
-      category: req.body.category,
-      date: req.body.date,
-      description: req.body.description || '',
+      currency: user.currency || 'BDT',
+      ...req.validatedBody,
     });
     res.status(201).json(transaction);
   } catch (error) {
@@ -31,12 +32,12 @@ router.post('/:userId', requireSameUser, async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireValidId(), validateRecord(), async (req, res) => {
   try {
     const updated = await Transaction.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
-      req.body,
-      { new: true },
+      req.validatedBody,
+      { new: true, runValidators: true },
     );
     if (!updated) return res.status(404).json({ error: 'Transaction not found' });
     res.json(updated);
@@ -45,7 +46,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireValidId(), async (req, res) => {
   try {
     const deleted = await Transaction.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!deleted) return res.status(404).json({ error: 'Transaction not found' });
