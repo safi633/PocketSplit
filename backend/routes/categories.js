@@ -30,7 +30,7 @@ router.put('/:id', requireValidId(), validateCategory, async (req, res) => {
     const updated = await Category.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       req.validatedBody,
-      { new: true, runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     );
     if (!updated) return res.status(404).json({ error: 'Category not found' });
     res.json(updated);

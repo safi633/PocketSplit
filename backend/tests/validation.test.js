@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { validateBudget, validateRecord } = require('../middleware/validation');
 const Transaction = require('../models/Transaction');
 const Income = require('../models/Income');
+const Expense = require('../models/Expense');
 
 function runMiddleware(middleware, body) {
   const req = { body };
@@ -87,4 +88,9 @@ test('white-box: records require a supported saved currency', async () => {
     assert.ok(error.errors.currency);
     return true;
   });
+
+  const validExpense = new Expense({
+    userId: '507f1f77bcf86cd799439011', date: '2026-08-01', category: 'Food', amount: 10, currency: 'BDT',
+  });
+  await validExpense.validate();
 });

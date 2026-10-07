@@ -5,7 +5,6 @@ const { promisify } = require('util');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const path = require('path');
 require('dotenv').config({ quiet: true });
 
 const authRoutes = require('./routes/auth');
@@ -31,17 +30,14 @@ function withDatabaseName(uri) {
 
 mongoose.set('bufferCommands', false);
 
-app.use(cors());
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()) : false,
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()) : true,
 }));
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
 app.use(express.json({ limit: '100kb' }));
-app.use('/css', express.static(path.join(__dirname, 'css')));
-app.use('/js', express.static(path.join(__dirname, 'js')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/incomes', incomeRoutes);
@@ -57,14 +53,6 @@ app.get('/api', (req, res) => {
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     databaseName: mongoose.connection.readyState === 1 ? mongoose.connection.name : null,
   });
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get(['/login.html', '/signup.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, req.path.slice(1)));
 });
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'API endpoint not found' }));

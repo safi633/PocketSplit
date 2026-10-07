@@ -33,7 +33,7 @@ router.put('/:id', requireValidId(), requireSameUser, async (req, res) => {
       update.password = await bcrypt.hash(req.body.password, 10);
     }
 
-    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).select('-password');
+    const user = await User.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after', runValidators: true }).select('-password');
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (error) {

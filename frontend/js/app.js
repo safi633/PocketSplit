@@ -8,6 +8,8 @@ const state = {
   activeTab: 'dashboard',
 };
 
+const apiBaseUrl = (window.EXPENSE_TRACKER_API_URL || '/api').replace(/\/$/, '');
+
 const bangla = {
   'Expense Tracker': 'খরচ ট্র্যাকার',
   'Manage your expenses smartly': 'স্মার্টভাবে আপনার খরচ পরিচালনা করুন',
@@ -87,7 +89,7 @@ const api = {
     const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
     if (state.token) headers.Authorization = `Bearer ${state.token}`;
 
-    const res = await fetch(`/api${path}`, {
+    const res = await fetch(`${apiBaseUrl}${path}`, {
       ...options,
       headers,
     });
@@ -311,6 +313,16 @@ function setContent(html) {
   translateElement(document.getElementById('content'));
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
+  })[character]);
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value);
+}
+
 async function renderDashboard() {
   if (!state.user) return;
   try {
@@ -335,16 +347,16 @@ async function renderDashboard() {
     const recent = [...monthlyTransactions]
       .sort((a, b) => `${b.date}${b.createdAt || ''}`.localeCompare(`${a.date}${a.createdAt || ''}`))
       .slice(0, 5);
-    const recentRows = recent.length ? recent.map((item) => `<tr><td>${item.date}</td><td>${item.type === 'income' ? 'Income' : 'Expense'}</td><td>${item.description || ''}</td><td>${item.category}</td><td class="${item.type === 'income' ? 'green' : 'red'}">${item.type === 'income' ? '+' : '-'}${formatMoney(item.amount, item.currency)}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;padding:18px;">No transactions recorded yet</td></tr>';
+    const recentRows = recent.length ? recent.map((item) => `<tr><td>${escapeHtml(item.date)}</td><td>${item.type === 'income' ? 'Income' : 'Expense'}</td><td>${escapeHtml(item.description)}</td><td>${escapeHtml(item.category)}</td><td class="${item.type === 'income' ? 'green' : 'red'}">${item.type === 'income' ? '+' : '-'}${formatMoney(item.amount, item.currency)}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;padding:18px;">No transactions recorded yet</td></tr>';
 
     setContent(`
-      <div class="welcome-header">Welcome back, <span>${state.user.name}!</span></div>
+      <div class="welcome-header">Welcome back, <span>${escapeHtml(state.user.name)}!</span></div>
       <div class="month-label">Summary for ${monthLabel()}</div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-label">Income This Month</div><div class="stat-value green">${formatMoney(received)}</div></div>
         <div class="stat-card"><div class="stat-label">Spent This Month</div><div class="stat-value red">${formatMoney(spent)}</div></div>
         <div class="stat-card"><div class="stat-label">Current Balance</div><div class="stat-value blue">${formatMoney(balance)}</div></div>
-        <div class="stat-card"><div class="stat-label">Top Category</div><div class="stat-value purple" style="font-size:18px">${topCat}</div></div>
+        <div class="stat-card"><div class="stat-label">Top Category</div><div class="stat-value purple" style="font-size:18px">${escapeHtml(topCat)}</div></div>
       </div>
       <div class="section-card blue">
         <div class="section-title">Recent Transactions</div>
@@ -361,8 +373,8 @@ async function renderExpenses() {
   try {
     const [categories, transactions] = await Promise.all([api.getCategories(state.user.id), api.getTransactions(state.user.id)]);
     const expenses = transactions.filter((item) => item.type === 'expense');
-    const catOptions = categories.map((c) => `<option value="${c.name}">${c.name}</option>`).join('');
-    const rows = expenses.map((e) => `<tr data-id="${e._id}" onclick="selectExpense('${e._id}')" style="cursor:pointer"><td>${e._id.slice(-4)}</td><td>${e.date}</td><td>${e.category}</td><td>${formatMoney(e.amount, e.currency)}</td><td>${e.description || ''}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No expenses yet</td></tr>';
+    const catOptions = categories.map((c) => `<option value="${escapeAttribute(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+    const rows = expenses.map((e) => `<tr data-id="${escapeAttribute(e._id)}" onclick="selectExpense('${escapeAttribute(e._id)}')" style="cursor:pointer"><td>${escapeHtml(e._id.slice(-4))}</td><td>${escapeHtml(e.date)}</td><td>${escapeHtml(e.category)}</td><td>${formatMoney(e.amount, e.currency)}</td><td>${escapeHtml(e.description)}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No expenses yet</td></tr>';
 
     setContent(`
       <div class="section-card blue">
@@ -398,13 +410,7 @@ function selectExpense(id) {
 
 async function addExpense() {
   try {
-    const payload = {
-      type: 'expense',
-      date: document.getElementById('expDate').value,
-      category: document.getElementById('expCat').value,
-      amount: Number(document.getElementById('expAmt').value),
-      description: document.getElementById('expDesc').value.trim(),
-    };
+    const payload = expensePayload();
     await api.addTransaction(state.user.id, payload);
     toast('Expense added');
     renderExpenses();
@@ -419,19 +425,28 @@ async function updateExpense() {
     return;
   }
   try {
-    const payload = {
-      type: 'expense',
-      date: document.getElementById('expDate').value,
-      category: document.getElementById('expCat').value,
-      amount: Number(document.getElementById('expAmt').value),
-      description: document.getElementById('expDesc').value.trim(),
-    };
+    const payload = expensePayload();
     await api.updateTransaction(state.selectedExpenseId, payload);
     toast('Expense updated');
     renderExpenses();
   } catch (error) {
     toast(error.message, 'error');
   }
+}
+
+function expensePayload() {
+  const date = document.getElementById('expDate').value;
+  const category = document.getElementById('expCat').value;
+  const amount = Number(document.getElementById('expAmt').value);
+  const description = document.getElementById('expDesc').value.trim();
+
+  if (!date) throw new Error('Please choose an expense date');
+  if (!category) throw new Error('Please choose an expense category');
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Expense amount must be greater than zero');
+  }
+
+  return { type: 'expense', date, category, amount, description };
 }
 
 async function deleteExpense() {
@@ -454,7 +469,7 @@ async function renderIncome() {
   if (!state.user) return;
   try {
     const incomes = await api.getIncomes(state.user.id);
-    const rows = incomes.map((income) => `<tr data-id="${income._id}" onclick="selectIncome('${income._id}')" style="cursor:pointer"><td>${income._id.slice(-4)}</td><td>${income.date}</td><td>${income.category}</td><td>${formatMoney(income.amount, income.currency)}</td><td>${income.description || ''}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No income recorded yet</td></tr>';
+    const rows = incomes.map((income) => `<tr data-id="${escapeAttribute(income._id)}" onclick="selectIncome('${escapeAttribute(income._id)}')" style="cursor:pointer"><td>${escapeHtml(income._id.slice(-4))}</td><td>${escapeHtml(income.date)}</td><td>${escapeHtml(income.category)}</td><td>${formatMoney(income.amount, income.currency)}</td><td>${escapeHtml(income.description)}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No income recorded yet</td></tr>';
 
     setContent(`
       <div class="section-card blue">
@@ -541,7 +556,7 @@ async function renderCategories() {
   if (!state.user) return;
   try {
     const categories = await api.getCategories(state.user.id);
-    const rows = categories.map((c) => `<tr data-id="${c._id}" onclick="state.selectedCategoryId='${c._id}'; document.getElementById('catName').value='${c.name}'; document.querySelectorAll('#catTbody tr').forEach(r=>r.classList.remove('selected')); this.closest('tr').classList.add('selected');" style="cursor:pointer"><td>${c._id.slice(-4)}</td><td>${c.name}</td></tr>`).join('') || '<tr><td colspan="2" style="text-align:center;color:#999;padding:16px">No categories yet</td></tr>';
+    const rows = categories.map((c) => `<tr data-id="${escapeAttribute(c._id)}" data-name="${escapeAttribute(c.name)}" onclick="selectCategory(this)" style="cursor:pointer"><td>${escapeHtml(c._id.slice(-4))}</td><td>${escapeHtml(c.name)}</td></tr>`).join('') || '<tr><td colspan="2" style="text-align:center;color:#999;padding:16px">No categories yet</td></tr>';
 
     setContent(`
       <div class="section-card blue">
@@ -563,6 +578,13 @@ async function renderCategories() {
   } catch (error) {
     toast(error.message, 'error');
   }
+}
+
+function selectCategory(row) {
+  state.selectedCategoryId = row.dataset.id;
+  document.getElementById('catName').value = row.dataset.name;
+  document.querySelectorAll('#catTbody tr').forEach((item) => item.classList.remove('selected'));
+  row.classList.add('selected');
 }
 
 async function addCategory() {
@@ -618,7 +640,7 @@ async function renderBudget() {
     const rows = budgets.map((b) => {
       const monthExpenses = (expenses || []).filter((e) => e.date && e.date.startsWith(b.month));
       const spent = monthExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
-      return `<tr data-id="${b._id}" onclick="state.selectedBudgetId='${b._id}'; document.getElementById('budMonth').value='${b.month}'; document.getElementById('budAmt').value='${b.amount}'; document.querySelectorAll('#budTbody tr').forEach(r=>r.classList.remove('selected')); this.closest('tr').classList.add('selected');" style="cursor:pointer"><td>${b._id.slice(-4)}</td><td>${b.month}</td><td>${formatMoney(b.amount)}</td><td>${formatMoney(spent)}</td></tr>`;
+      return `<tr data-id="${escapeAttribute(b._id)}" data-month="${escapeAttribute(b.month)}" data-amount="${escapeAttribute(b.amount)}" onclick="selectBudget(this)" style="cursor:pointer"><td>${escapeHtml(b._id.slice(-4))}</td><td>${escapeHtml(b.month)}</td><td>${formatMoney(b.amount)}</td><td>${formatMoney(spent)}</td></tr>`;
     }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No budgets yet</td></tr>';
 
     setContent(`
@@ -641,6 +663,14 @@ async function renderBudget() {
   } catch (error) {
     toast(error.message, 'error');
   }
+}
+
+function selectBudget(row) {
+  state.selectedBudgetId = row.dataset.id;
+  document.getElementById('budMonth').value = row.dataset.month;
+  document.getElementById('budAmt').value = row.dataset.amount;
+  document.querySelectorAll('#budTbody tr').forEach((item) => item.classList.remove('selected'));
+  row.classList.add('selected');
 }
 
 async function addBudget() {
@@ -673,7 +703,7 @@ async function renderReports() {
   if (!state.user) return;
   try {
     const reports = await api.getReports(state.user.id);
-    const rows = reports.length ? reports.map((r) => `<tr><td>${r.type === 'income' ? 'Income' : 'Expense'}</td><td>${r.category}</td><td>${formatMoney(r.total)}</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:#999;padding:16px">No data yet</td></tr>';
+    const rows = reports.length ? reports.map((r) => `<tr><td>${r.type === 'income' ? 'Income' : 'Expense'}</td><td>${escapeHtml(r.category)}</td><td>${formatMoney(r.total)}</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:#999;padding:16px">No data yet</td></tr>';
     setContent(`
       <div class="reports-title">Income & Expense Report</div>
       <div class="section-card blue">
@@ -694,9 +724,9 @@ async function renderProfile() {
       <div class="section-card blue">
         <div class="section-title">User Profile</div>
         <div class="profile-form">
-          <div class="form-group"><label>Full Name</label><input class="form-input" id="pfName" type="text" value="${user.name}"></div>
-          <div class="form-group"><label>Username</label><input class="form-input" id="pfUser" type="text" value="${user.username}" readonly></div>
-          <div class="form-group"><label>Email</label><input class="form-input" id="pfEmail" type="text" value="${user.email || ''}"></div>
+          <div class="form-group"><label>Full Name</label><input class="form-input" id="pfName" type="text" value="${escapeAttribute(user.name)}"></div>
+          <div class="form-group"><label>Username</label><input class="form-input" id="pfUser" type="text" value="${escapeAttribute(user.username)}" readonly></div>
+          <div class="form-group"><label>Email</label><input class="form-input" id="pfEmail" type="text" value="${escapeAttribute(user.email)}"></div>
           <div class="form-group"><label>New Password</label><input class="form-input" id="pfPass" type="password" placeholder="••••••••"></div>
           <button class="btn btn-blue" onclick="updateProfile()" style="margin-top:8px">Update Profile</button>
         </div>
@@ -790,8 +820,10 @@ window.deleteIncome = deleteIncome;
 window.addCategory = addCategory;
 window.updateCategory = updateCategory;
 window.deleteCategory = deleteCategory;
+window.selectCategory = selectCategory;
 window.addBudget = addBudget;
 window.deleteBudget = deleteBudget;
+window.selectBudget = selectBudget;
 window.updateProfile = updateProfile;
 window.saveSettings = saveSettings;
 window.previewTheme = previewTheme;

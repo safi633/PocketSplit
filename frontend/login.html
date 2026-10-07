@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expense Tracker</title>
+  <title>Expense Tracker Login</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
@@ -51,53 +51,7 @@
     </div>
   </div>
 
-  <div id="app">
-    <div class="app-header">
-      <div class="app-header-title">💰 Expense Tracker</div>
-      <button class="dots-btn" onclick="showAbout()" title="About">••••</button>
-    </div>
-    <div class="app-body">
-      <nav class="sidebar">
-        <button class="nav-btn active" onclick="switchTab('dashboard', this)">🏠 <span>Dashboard</span></button>
-        <button class="nav-btn" onclick="switchTab('expenses', this)">💸 <span>Expenses</span></button>
-        <button class="nav-btn" onclick="switchTab('income', this)">💰 <span>Income</span></button>
-        <button class="nav-btn" onclick="switchTab('categories', this)">🏷️ <span>Categories</span></button>
-        <button class="nav-btn" onclick="switchTab('budget', this)">🎯 <span>Budgets</span></button>
-        <button class="nav-btn" onclick="switchTab('reports', this)">📊 <span>Reports</span></button>
-        <button class="nav-btn" onclick="switchTab('profile', this)">👤 <span>Profile</span></button>
-        <button class="nav-btn" onclick="switchTab('settings', this)">⚙️ <span>Settings</span></button>
-        <div class="spacer"></div>
-        <button class="nav-btn" onclick="doLogout()" style="color:#ff7675;">🚪 <span>Logout</span></button>
-      </nav>
-      <div class="content" id="content"></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="aboutModal">
-    <div class="modal">
-      <h3>Why Track Your Expenses?</h3>
-      <p>Tracking expenses is key to financial success. It helps you:</p>
-      <ul>
-        <li>Gain clear insight into your spending habits</li>
-        <li>Identify and reduce unnecessary expenses</li>
-        <li>Create realistic and effective budgets</li>
-      </ul>
-      <button class="modal-close" onclick="closeAbout()">Close</button>
-    </div>
-  </div>
-
-  <div class="confirm-overlay" id="confirmDialog">
-    <div class="confirm-box">
-      <p id="confirmMsg">Are you sure?</p>
-      <div class="confirm-btns">
-        <button class="btn btn-blue" onclick="confirmYes()">Yes</button>
-        <button class="btn" style="background:#999" onclick="confirmNo()">No</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
+  <script src="/js/config.js"></script>
   <script src="/js/app.js"></script>
 </body>
 </html>

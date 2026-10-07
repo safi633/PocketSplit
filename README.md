@@ -1,25 +1,53 @@
 # Expense Tracker
 
-A Node.js, Express, MongoDB expense tracker with separate income records, budgets, categories, and reporting.
+The application is split into two projects:
+
+- `frontend/` contains the static HTML, CSS, and browser JavaScript.
+- `backend/` contains the Express and MongoDB API.
+
+This is a localhost-only project.
 
 ## Run locally
 
-1. Copy `.env.example` to `.env` and set a strong `JWT_SECRET`.
-2. Start MongoDB locally, or set `MONGO_URI` to your MongoDB connection string.
-3. Install and run the app:
+1. In `backend/`, create/edit `.env` with the following variables:
+
+   ```
+   PORT=5000
+   MONGO_URI=mongodb://127.0.0.1:27017/expense-tracker
+   JWT_SECRET=replace-with-a-long-random-secret
+   ```
+
+   `MONGO_URI` can point to a local MongoDB or an Atlas cluster. `JWT_SECRET` must be a long random string.
+
+2. Install and start the API:
 
    ```sh
+   cd backend
    npm install
    npm run dev
    ```
 
-Open `http://localhost:5000`.
+3. Serve `frontend/` with any static web server. For example:
+
+   ```sh
+   npx serve frontend
+   ```
+
+`frontend/js/config.js` automatically uses `http://localhost:5000/api` on localhost.
 
 ## Quality checks
 
 ```sh
-npm test        # unit / white-box and API / black-box tests
-npm run check   # tests plus a production dependency audit
+cd backend
+npm test
+npm run check
 ```
 
-The server validates incoming data, limits API requests, sends security headers, uses per-user database indexes, and does not expose project files through the static-file server.
+## Migrating legacy expense records
+
+If you previously stored expenses in a combined `transactions` collection, run the one-time migration to move them into the `expenses` collection:
+
+```sh
+cd backend
+npm run migrate:expenses
+```
