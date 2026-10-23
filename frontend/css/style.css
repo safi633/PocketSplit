@@ -11,7 +11,6 @@
   --text-muted: #636e72;
   --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
-
 :root[data-theme="dark"] {
   --sidebar: #111827;
   --sidebar-hover: #1f2937;
@@ -25,11 +24,9 @@
   --text-muted: #aab6ca;
   --card-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text-dark); }
 :root[data-language="bangla"] body { font-family: 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif; }
-
 .auth-page { display: none; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #8200ff, #00c8ff); }
 .auth-page.active { display: flex; }
 .glass-card { width: 840px; max-width: 95vw; display: grid; grid-template-columns: 1fr 1fr; border-radius: 28px; overflow: hidden; box-shadow: 6px 6px 30px rgba(0,0,0,0.35); }
@@ -45,7 +42,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .grad-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #ff0096, #00b4ff); border: none; border-radius: 24px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
 .auth-switch { margin-top: 20px; text-align: center; color: #b4b4d2; font-size: 13px; }
 .auth-switch a { color: #00b4ff; font-weight: 700; cursor: pointer; text-decoration: none; }
-
 #app { display: none; height: 100vh; flex-direction: column; }
 #app.active { display: flex; }
 .app-header { height: 60px; background: var(--sidebar); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
