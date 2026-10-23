@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-const expenseSchema = new mongoose.Schema({
+const expenseSchema = new mongoose.Schema(
+  {
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   amount: { type: Number, required: true, min: 0.01 },
   currency: { type: String, enum: ['BDT', 'USD', 'EUR', 'GBP', 'INR'], required: true },
@@ -10,5 +11,4 @@ const expenseSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 expenseSchema.index({ userId: 1, date: -1, createdAt: -1 });
-
 module.exports = mongoose.model('Expense', expenseSchema);
