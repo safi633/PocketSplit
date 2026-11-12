@@ -1,7 +1,7 @@
 {
-  "name": "expense-tracker-backend",
+  "name": "pocketsplit-backend",
   "version": "1.0.0",
-  "description": "API for the Expense Tracker application.",
+  "description": "API for the PocketSplit application.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

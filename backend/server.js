@@ -17,8 +17,8 @@ const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const mongoDbName = 'expense-tracker';
-const mongoUri = withDatabaseName(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/expense-tracker');
+const mongoDbName = 'pocketsplit';
+const mongoUri = withDatabaseName(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/pocketsplit');
 
 function withDatabaseName(uri) {
   const parsedUri = new URL(uri);
@@ -49,7 +49,7 @@ app.use('/api/profile', profileRoutes);
 
 app.get('/api', (req, res) => {
   res.json({
-    message: 'Expense Tracker API Running',
+    message: 'PocketSplit API Running',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     databaseName: mongoose.connection.readyState === 1 ? mongoose.connection.name : null,
   });

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'expense-tracker-development-jwt-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'pocketsplit-development-jwt-secret';
 
 if (!process.env.JWT_SECRET) {
   console.warn('JWT_SECRET is missing in .env; using the development secret.');

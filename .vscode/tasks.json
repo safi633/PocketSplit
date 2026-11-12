@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start Expense Tracker",
+      "label": "Start PocketSplit",
       "type": "shell",
       "command": "node server.js",
       "options": {

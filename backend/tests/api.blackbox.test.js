@@ -6,7 +6,7 @@ const { app } = require('../server');
 test('black-box: API health endpoint is available with security headers', async () => {
   const response = await request(app).get('/api').expect(200);
 
-  assert.equal(response.body.message, 'Expense Tracker API Running');
+  assert.equal(response.body.message, 'PocketSplit API Running');
   assert.equal(response.headers['x-powered-by'], undefined);
   assert.equal(response.headers['x-content-type-options'], 'nosniff');
 });
