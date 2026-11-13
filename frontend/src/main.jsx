@@ -248,7 +248,19 @@ function RecordPage({ kind, user, data, perform, notify }) {
   const categories = isExpense ? data.categories.map((item) => item.name) : ['Salary', 'Freelance', 'Business', 'Investment', 'Bonus', 'Other'];
   const [selectedId, setSelectedId] = useState('');
   const [form, setForm] = useState(emptyRecord);
+  const [search, setSearch] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+
+  // NEW: client-side search + category filter (no backend change needed)
+  const visibleRecords = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return records.filter((record) =>
+      (!filterCategory || record.category === filterCategory) &&
+      (!term || `${record.description || ''} ${record.category} ${record.date} ${record.amount}`.toLowerCase().includes(term)));
+  }, [records, search, filterCategory]);
+  const visibleTotal = visibleRecords.reduce((sum, record) => sum + Number(record.amount), 0);
+  const filtering = Boolean(search.trim() || filterCategory);
 
   function select(record) {
     setSelectedId(record._id);
@@ -293,8 +305,16 @@ function RecordPage({ kind, user, data, perform, notify }) {
       </form>
     </Section>
     <Section title={`Your ${isExpense ? 'expenses' : 'income records'}`}>
+      <div className="form-row" style={{ marginBottom: 12 }}>
+        <FormField label="Search" value={search} onChange={setSearch} placeholder="Description, category, date…" />
+        <FormField label="Filter category" value={filterCategory} options={categories} onChange={setFilterCategory} />
+        <div className="form-actions">{filtering && <button className="btn btn-quiet" type="button" onClick={() => { setSearch(''); setFilterCategory(''); }}>Clear filters</button>}</div>
+      </div>
+      <p className="auth-subtitle" style={{ margin: '0 0 8px' }}>
+        Showing {visibleRecords.length} of {records.length} · Total: <strong>{money(visibleTotal, user.currency, user.language)}</strong>
+      </p>
       <DataTable headers={['ID', 'Date', 'Category', 'Amount', 'Description']}>
-        {records.length ? records.map((record) => <tr key={record._id} className={selectedId === record._id ? 'selected' : ''} onClick={() => select(record)} tabIndex="0" onKeyDown={(event) => { if (event.key === 'Enter') select(record); }}><td>{record._id.slice(-4)}</td><td>{record.date}</td><td>{record.category}</td><td>{money(record.amount, record.currency || user.currency, user.language)}</td><td>{record.description || '—'}</td></tr>) : <EmptyRow columns={5}>{isExpense ? 'No expenses yet' : 'No income recorded yet'}</EmptyRow>}
+        {visibleRecords.length ? visibleRecords.map((record) => <tr key={record._id} className={selectedId === record._id ? 'selected' : ''} onClick={() => select(record)} tabIndex="0" onKeyDown={(event) => { if (event.key === 'Enter') select(record); }}><td>{record._id.slice(-4)}</td><td>{record.date}</td><td>{record.category}</td><td>{money(record.amount, record.currency || user.currency, user.language)}</td><td>{record.description || '—'}</td></tr>) : <EmptyRow columns={5}>{filtering ? 'No records match your search' : isExpense ? 'No expenses yet' : 'No income recorded yet'}</EmptyRow>}
       </DataTable>
     </Section>
   </>;
