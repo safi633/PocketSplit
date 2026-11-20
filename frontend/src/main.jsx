@@ -156,13 +156,14 @@ function App() {
     categories: <CategoryPage {...contentProps} />,
     budgets: <BudgetPage {...contentProps} />,
     reports: <ReportsPage {...contentProps} />,
+    charts: <ExpenseChart {...contentProps} />,
     profile: <ProfilePage {...contentProps} />,
     settings: <SettingsPage {...contentProps} />,
   };
 
   const nav = [
     ['dashboard', 'Overview', '⌂'], ['expenses', 'Expenses', '−'], ['income', 'Income', '+'],
-    ['categories', 'Categories', '▦'], ['budgets', 'Budgets', '◷'], ['reports', 'Reports', '▤'],
+    ['categories', 'Categories', '▦'], ['budgets', 'Budgets', '◷'], ['reports', 'Reports', '▤'], ['charts', 'Charts', '📊'],
     ['profile', 'Profile', '◉'], ['settings', 'Settings', '⚙'],
   ];
 
@@ -431,6 +432,81 @@ function SettingsPage({ user, setUser, perform, notify }) {
       <button className="btn btn-blue">Save preferences</button>
     </form></Section>
   </>;
+}
+
+function ExpenseChart({ user, data }) {
+  const month = currentMonth();
+  const monthExpenses = data.expenses.filter((item) => item.date?.startsWith(month));
+
+  const categoryTotals = monthExpenses.reduce((acc, item) => {
+    acc[item.category] = (acc[item.category] || 0) + Number(item.amount);
+    return acc;
+  }, {});
+
+  const sorted = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+  const max = sorted[0]?.[1] || 1;
+  const currency = user.currency || 'BDT';
+  const BAR_COLORS = ['#4169e1', '#00b894', '#dc143c', '#ff8c00', '#9b5cff', '#20d4d1', '#e84393', '#f1c40f'];
+
+  if (sorted.length === 0) {
+    return (
+      <>
+        <PageHeading title="Spending Chart" subtitle="Visual breakdown of this month's expenses." />
+        <Section title="This month — by category">
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '32px 0' }}>
+            No expenses recorded this month yet.
+          </p>
+        </Section>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <PageHeading title="Spending Chart" subtitle={`Visual breakdown of ${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}.`} />
+      <Section title="Expenses by category — this month">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {sorted.map(([category, total], index) => {
+            const pct = Math.round((total / max) * 100);
+            const color = BAR_COLORS[index % BAR_COLORS.length];
+            return (
+              <div key={category}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 13, fontWeight: 600 }}>
+                  <span>{category}</span>
+                  <span style={{ color }}>{money(total, currency, user.language)}</span>
+                </div>
+                <div style={{ background: '#e8edf5', borderRadius: 8, height: 22, overflow: 'hidden' }}>
+                  <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 8, transition: 'width 0.5s ease', display: 'flex', alignItems: 'center', paddingLeft: 8, color: '#fff', fontSize: 11, fontWeight: 700 }}>
+                    {pct > 10 ? `${pct}%` : ''}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+      <Section title="Summary">
+        <DataTable headers={['Category', 'Amount', '% of Total']}>
+          {sorted.map(([category, total]) => {
+            const grandTotal = sorted.reduce((s, [, v]) => s + v, 0);
+            const share = ((total / grandTotal) * 100).toFixed(1);
+            return (
+              <tr key={category}>
+                <td>{category}</td>
+                <td>{money(total, currency, user.language)}</td>
+                <td>{share}%</td>
+              </tr>
+            );
+          })}
+          <tr style={{ fontWeight: 700, background: '#f0f5fa' }}>
+            <td>Total</td>
+            <td>{money(sorted.reduce((s, [, v]) => s + v, 0), currency, user.language)}</td>
+            <td>100%</td>
+          </tr>
+        </DataTable>
+      </Section>
+    </>
+  );
 }
 
 createRoot(document.getElementById('root')).render(<App />);
