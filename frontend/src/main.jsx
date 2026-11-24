@@ -118,6 +118,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [restoring, setRestoring] = useState(Boolean(localStorage.getItem('authToken')));
   const [tab, setTab] = useState('dashboard');
+  const [navMoreOpen, setNavMoreOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
   const [chatOpen, setChatOpen] = useState(false);
   const [coachOrigin, setCoachOrigin] = useState(null);
@@ -136,10 +137,10 @@ function App() {
     if (button) {
       const launcher = button.getBoundingClientRect();
       const mobile = window.matchMedia('(max-width: 700px)').matches;
-      const width = mobile ? window.innerWidth - 20 : Math.min(440, window.innerWidth - 32);
-      const height = mobile ? window.innerHeight - 20 : Math.min(720, window.innerHeight - 32);
-      const left = mobile ? 10 : window.innerWidth - 24 - width;
-      const top = mobile ? 10 : window.innerHeight - 24 - height;
+      const width = mobile ? window.innerWidth - 16 : Math.min(440, window.innerWidth - 32);
+      const height = mobile ? window.innerHeight - 144 : Math.min(720, window.innerHeight - 32);
+      const left = mobile ? 8 : window.innerWidth - 24 - width;
+      const top = mobile ? 66 : window.innerHeight - 24 - height;
       setCoachOrigin({ x: launcher.left + launcher.width / 2 - left, y: launcher.top + launcher.height / 2 - top });
     }
     setChatOpen(true);
@@ -219,6 +220,8 @@ function App() {
     ['categories', 'Categories', 'categories'], ['budgets', 'Budgets', 'budgets'], ['reports', 'Reports', 'reports'],
     ['profile', 'Profile', 'profile'], ['settings', 'Settings', 'settings'],
   ];
+  const primaryNav = nav.filter(([id]) => ['dashboard', 'expenses', 'income', 'budgets'].includes(id));
+  const secondaryNav = nav.filter(([id]) => !primaryNav.some(([primaryId]) => primaryId === id));
 
   return (
     <div className="app-shell">
@@ -228,7 +231,11 @@ function App() {
       </header>
       <div className="app-body">
         <nav className="sidebar" aria-label="Main navigation">
-          {nav.map(([id, label, icon]) => <button key={id} className={`nav-btn ${tab === id ? 'active' : ''}`} onClick={() => setTab(id)} aria-label={label} title={label} aria-current={tab === id ? 'page' : undefined}><NavIcon name={icon} /><span>{label}</span></button>)}
+          {nav.map(([id, label, icon]) => <button key={id} className={`nav-btn ${secondaryNav.some(([secondaryId]) => secondaryId === id) ? 'mobile-secondary' : ''} ${tab === id ? 'active' : ''}`} onClick={() => { setTab(id); setNavMoreOpen(false); }} aria-label={label} title={label} aria-current={tab === id ? 'page' : undefined}><NavIcon name={icon} /><span>{label}</span></button>)}
+          <button className={`mobile-more-toggle ${secondaryNav.some(([id]) => id === tab) ? 'active' : ''}`} type="button" aria-expanded={navMoreOpen} aria-controls="mobile-more-menu" onClick={() => setNavMoreOpen((open) => !open)}><NavIcon name="more" /><span>More</span></button>
+          {navMoreOpen && <div className="mobile-more-menu" id="mobile-more-menu" aria-label="More pages">
+            {secondaryNav.map(([id, label, icon]) => <button key={id} className={`nav-btn ${tab === id ? 'active' : ''}`} type="button" onClick={() => { setTab(id); setNavMoreOpen(false); }} aria-current={tab === id ? 'page' : undefined}><NavIcon name={icon} /><span>{label}</span></button>)}
+          </div>}
         </nav>
         <main className="content" id="main-content">{screens[tab]}</main>
       </div>
@@ -262,6 +269,7 @@ function NavIcon({ name }) {
     reports: <><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/></>,
     profile: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,
     settings: <><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.28 5.28l1.41 1.41M17.31 17.31l1.41 1.41M18.72 5.28l-1.41 1.41M6.69 17.31l-1.41 1.41"/></>,
+    more: <><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></>,
     about: <><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></>,
     logout: <><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></>,
     edit: <><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></>,
@@ -355,7 +363,17 @@ function StatCard({ label, value, tone }) {
 }
 
 function DataTable({ headers, children }) {
-  return <div className="table-wrap"><table><thead><tr>{headers.map((header) => <th key={header}>{header}</th>)}</tr></thead><tbody>{children}</tbody></table></div>;
+  const labeledRows = React.Children.map(children, (row) => {
+    if (!React.isValidElement(row) || row.type !== 'tr') return row;
+    return React.cloneElement(row, {
+      children: React.Children.map(row.props.children, (cell, index) => (
+        React.isValidElement(cell) && cell.type === 'td' && !cell.props.colSpan
+          ? React.cloneElement(cell, { 'data-label': headers[index] })
+          : cell
+      )),
+    });
+  });
+  return <div className="table-wrap"><table><thead><tr>{headers.map((header) => <th key={header}>{header}</th>)}</tr></thead><tbody>{labeledRows}</tbody></table></div>;
 }
 
 function FormField({ label, value, onChange, type = 'text', options, placeholder, min, step, readOnly = false }) {
