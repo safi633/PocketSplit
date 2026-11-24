@@ -6,6 +6,7 @@ const isValidDate = (value) => typeof value === 'string'
   && !Number.isNaN(new Date(`${value}T00:00:00Z`).getTime());
 const isValidMonth = (value) => typeof value === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 const isPositiveAmount = (value) => Number.isFinite(Number(value)) && Number(value) > 0;
+const supportedCurrencies = new Set(['BDT', 'USD', 'EUR', 'GBP', 'INR']);
 
 const validationError = (res, message) => res.status(400).json({ error: message });
 
@@ -51,10 +52,11 @@ const validateRecord = (requiredType) => (req, res, next) => {
 };
 
 const validateBudget = (req, res, next) => {
-  const { month, amount } = req.body;
+  const { month, amount, currency } = req.body;
   if (!isValidMonth(month)) return validationError(res, 'Month must use YYYY-MM format');
   if (!isPositiveAmount(amount)) return validationError(res, 'Budget amount must be greater than zero');
-  req.validatedBody = { month, amount: Number(amount) };
+  if (currency !== undefined && !supportedCurrencies.has(currency)) return validationError(res, 'Choose a supported currency');
+  req.validatedBody = { month, amount: Number(amount), ...(currency ? { currency } : {}) };
   return next();
 };
 

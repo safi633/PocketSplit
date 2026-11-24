@@ -19,15 +19,15 @@ router.get('/:userId', requireValidId('userId'), requireSameUser, async (req, re
       ...incomes.map((income) => ({ ...income, type: 'income' })),
     ];
     const totals = records.reduce((acc, item) => {
-      const key = `${item.type}:${item.category}`;
+      const key = JSON.stringify([item.type, item.currency || 'BDT', item.category]);
       acc[key] = (acc[key] || 0) + Number(item.amount);
       return acc;
     }, {});
 
     res.json(Object.entries(totals).map(([key, total]) => {
-      const [type, category] = key.split(':');
-      return { type, category, total };
-    }).sort((a, b) => a.type.localeCompare(b.type) || a.category.localeCompare(b.category)));
+      const [type, currency, category] = JSON.parse(key);
+      return { type, currency, category, total };
+    }).sort((a, b) => a.type.localeCompare(b.type) || a.category.localeCompare(b.category) || a.currency.localeCompare(b.currency)));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
