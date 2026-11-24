@@ -40,4 +40,8 @@ export const api = {
   getReports: (userId) => request(`/reports/${userId}`),
   getProfile: (id) => request(`/profile/${id}`),
   updateProfile: (id, payload) => request(`/profile/${id}`, json('PUT', payload)),
+  getAiModels: () => request('/ai/models'),
+  chatWithCoach: (message, history, model, signal, attachment) => request('/ai/chat', { ...json('POST', { message, history, model, ...(attachment ? { attachment } : {}) }), signal }),
+  confirmAiAction: (id) => request(`/ai/actions/${id}/confirm`, json('POST', {})),
+  cancelAiAction: (id) => request(`/ai/actions/${id}/cancel`, json('POST', {})),
 };

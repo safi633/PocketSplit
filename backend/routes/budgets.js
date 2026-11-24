@@ -1,5 +1,6 @@
 const express = require('express');
 const Budget = require('../models/Budget');
+const User = require('../models/User');
 const { requireAuth, requireSameUser } = require('../middleware/auth');
 const { requireValidId, validateBudget } = require('../middleware/validation');
 
@@ -18,14 +19,18 @@ router.get('/:userId', requireValidId('userId'), requireSameUser, async (req, re
 
 router.post('/:userId', requireValidId('userId'), requireSameUser, validateBudget, async (req, res) => {
   try {
+    const user = await User.findById(req.user.id).select('currency');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const currency = req.validatedBody.currency || user.currency || 'BDT';
     const existing = await Budget.findOne({ userId: req.params.userId, month: req.validatedBody.month });
     if (existing) {
       existing.amount = req.validatedBody.amount;
+      existing.currency = currency;
       await existing.save();
       return res.json(existing);
     }
 
-    const budget = await Budget.create({ userId: req.params.userId, ...req.validatedBody });
+    const budget = await Budget.create({ userId: req.params.userId, ...req.validatedBody, currency });
     res.status(201).json(budget);
   } catch (error) {
     res.status(500).json({ error: error.message });
