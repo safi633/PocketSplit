@@ -1,4 +1,9 @@
 const jwt = require('jsonwebtoken');
+
+if (process.env.VERCEL === '1' && !process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET must be configured for Vercel deployments.');
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || 'pocketsplit-development-jwt-secret';
 
 if (!process.env.JWT_SECRET) {
